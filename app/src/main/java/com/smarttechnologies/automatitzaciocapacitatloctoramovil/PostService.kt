@@ -5,7 +5,6 @@ import android.content.Intent
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -24,23 +23,53 @@ class PostService : IntentService("PostService") {
     lateinit var token: String
     override fun onHandleIntent(intent: Intent?) {
         println("Mandamos")
+
+        val formatoFecha = SimpleDateFormat("yyyy-MM-dd")
+        val fechaActual = formatoFecha.format(Date())
+        val nombreArchivo = "$fechaActual.txt"
         token = obtenerToken("TOKENDEPROVA")
         //Obtenim la informació dels fitxers i la posem en un json
-        var info = getInfo()
+        var info = getInfo(nombreArchivo)
+        var status : Boolean
+        status = false
         for(data in info){
             // Aquí es donde se realizará el POST request al servidor.
-            enviarPostRequestAlServidor(generateJson(data),"https://smarttechnologiesurv.000webhostapp.com/api/sensorData.php")
+            status = enviarPostRequestAlServidor(generateJson(data),"https://smarttechnologiesurv.000webhostapp.com/api/sensorData.php")
+            if(status==false){
+                break
+            }
+        }
+        if(status==true){
+            borrarArchivo(nombreArchivo)
         }
 
     }
-    private fun getInfo() : List<sensorData>{
+    private fun borrarArchivo(nombreArchivo: String):Boolean{
+        val directorio = filesDir // Obtén el directorio de archivos de la aplicación
+        val file: File = File(directorio,nombreArchivo)
+
+        // Verificar si el archivo existe antes de intentar borrarlo
+
+        // Verificar si el archivo existe antes de intentar borrarlo
+        return if (file.exists()) {
+            // Intentar borrar el archivo
+            if (file.delete()) {
+                // El archivo se borró exitosamente
+                true
+            } else {
+                // Fallo al borrar el archivo
+                false
+            }
+        } else {
+            // El archivo no existe, no es necesario borrarlo
+            false
+        }
+    }
+    private fun getInfo(nombreArchivo:String) : List<sensorData>{
         val datos = arrayListOf<sensorData>()
 
         try {
-            val tiempoActual = System.currentTimeMillis()
-            val formatoFecha = SimpleDateFormat("yyyy-MM-dd")
-            val fechaActual = formatoFecha.format(Date())
-            val nombreArchivo = "$fechaActual.txt"
+
             val directorio = filesDir // Obtén el directorio de archivos de la aplicación
 
             val inputStream = FileInputStream(File(directorio, nombreArchivo))
@@ -51,7 +80,13 @@ class PostService : IntentService("PostService") {
                 val fields = line.split(";")
                 if (fields.size > 3) {
                     val timestamp = fields[0].toLongOrNull()
-                    val type = fields[1]
+                    var type : String?
+                    if(fields[1]=="ACC"){
+                         type = "1"
+                    }else{
+                         type = fields[1]
+                    }
+
                     val values = fields.subList(2, 5).map { it.toDoubleOrNull() ?: 0 }
 
                     var guardar:sensorData? = null
@@ -129,7 +164,8 @@ class PostService : IntentService("PostService") {
         for (dataEntry in dataEntries.getData()) {
             val entryObject = JsonObject()
             entryObject.addProperty("timestamp", dataEntry.timestamp)
-            entryObject.addProperty("values", dataEntry.values.toString())
+
+            entryObject.add("values", gson.toJsonTree(dataEntry.values))
             dataArray.add(entryObject)
         }
 
@@ -141,7 +177,7 @@ class PostService : IntentService("PostService") {
 
 
 
-    private fun enviarPostRequestAlServidor(text: String, url: String) {
+    private fun enviarPostRequestAlServidor(text: String, url: String) : Boolean {
         println(text)
         val client = OkHttpClient()
 
@@ -160,9 +196,15 @@ class PostService : IntentService("PostService") {
             val responseData = response.body?.string()
             println(responseData)
             response.close()
+            val jsonResponse = responseData?.let { json ->
+                val jsonObject = JSONObject(json)
+                return jsonObject.optBoolean("status")
+            }
         } catch (e: IOException) {
             e.printStackTrace()
+            return false
         }
+        return false
     }
     fun obtenerToken(publicKey: String): String{
         val publicKey = publicKey
