@@ -34,12 +34,13 @@ class PostService : IntentService("PostService") {
         status = false
         for(data in info){
             // Aquí es donde se realizará el POST request al servidor.
-            status = enviarPostRequestAlServidor(generateJson(data),"https://smarttechnologiesurv.000webhostapp.com/api/sensorData.php")
+            status = enviarPostRequestAlServidor(generateJson(data),"https://smarttechnologiesurv.000webhostapp.com/api/sensorData.php?ms=1")
             if(status==false){
                 break
             }
         }
         if(status==true){
+            println("Borramos el archivo")
             borrarArchivo(nombreArchivo)
         }
 
@@ -82,7 +83,7 @@ class PostService : IntentService("PostService") {
                     val timestamp = fields[0].toLongOrNull()
                     var type : String?
                     if(fields[1]=="ACC"){
-                         type = "1"
+                         type = "2"
                     }else{
                          type = fields[1]
                     }
@@ -121,7 +122,7 @@ class PostService : IntentService("PostService") {
                     lateinit var tipo_test: String
                     if(type_info[0]=="BALANCE"){
                         params = "?testType=2"+params
-                    }else if(type_info[1]=="CHAIR"){
+                    }else if(type_info[0]=="CHAIR"){
                         params ="?testType=1"+params
                     }
                     //Hacemos un GET request con los params y el header
@@ -138,10 +139,10 @@ class PostService : IntentService("PostService") {
                     try {
                         val response = client.newCall(request).execute()
                         val responseData = response.body?.string()
+                        println("https://smarttechnologiesurv.000webhostapp.com/api/testData.php"+params)
                         println(responseData)
                     } catch (e: IOException) {
                         e.printStackTrace()
-                        println("ERROR TOKEN")
                     }
                 }
 
