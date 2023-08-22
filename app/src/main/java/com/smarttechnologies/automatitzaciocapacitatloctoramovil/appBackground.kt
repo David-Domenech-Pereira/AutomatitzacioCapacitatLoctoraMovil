@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -36,7 +37,7 @@ abstract class appBackground : ComponentActivity() {
     private val dataList = ArrayList<Entry>()
     protected lateinit var sensorManager: SensorManager
     protected var accelerometer: Sensor? = null
-
+    protected lateinit var imageView: ImageView
     protected lateinit var textView: TextView
     protected lateinit var boton: Button
 
@@ -45,7 +46,8 @@ abstract class appBackground : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.cadira);
-
+        boton = findViewById(R.id.end)
+        imageView = findViewById(R.id.imageView)
     }
     public fun start(type: String){
 
@@ -55,7 +57,7 @@ abstract class appBackground : ComponentActivity() {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         textView = findViewById(R.id.textView)
-        textView.text = "Col·loca el dispositu a la butxaca esquerra"
+
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed({
             empieza()
@@ -85,7 +87,7 @@ abstract class appBackground : ComponentActivity() {
 
         sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
 
-        boton = findViewById(R.id.end)
+
         boton.setOnClickListener {
             //carguem el end
             end()

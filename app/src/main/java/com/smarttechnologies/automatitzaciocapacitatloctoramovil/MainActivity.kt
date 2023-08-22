@@ -34,7 +34,9 @@ class MainActivity : ComponentActivity() {
         but_fit.setOnClickListener { // Cuando se hace clic en el botón, llamamos al método para mostrar el contenido del archivo
             showFileContent()
         }
+        startService(Intent(this, BackgroundSensor::class.java))
         configurarServidor()
+
     }
     private fun configurarServidor(){
         println("Configurado")

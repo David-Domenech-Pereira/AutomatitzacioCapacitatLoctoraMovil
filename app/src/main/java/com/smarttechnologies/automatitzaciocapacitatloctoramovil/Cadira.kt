@@ -10,6 +10,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.os.Vibrator
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -30,10 +31,14 @@ class Cadira : appBackground() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         start("CHAIR_START")
-
+        boton.visibility = View.GONE
+        textView.text = "Col·loca el dispositiu a la butxaca esquerra i fes com la imatge"
+        val nuevaImagen = resources.getDrawable(R.drawable.chair)
+        imageView.setImageDrawable(nuevaImagen)
 
     }
     override fun end(){
+        boton.visibility = View.VISIBLE
         //apaguem el sensor
         sensorManager.unregisterListener(sensorEventListener)
      //   sensorManager.unregisterListener(sensorEventListener_hr)
