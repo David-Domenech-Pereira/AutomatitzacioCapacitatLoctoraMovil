@@ -82,7 +82,7 @@ class PostService : IntentService("PostService") {
                 if (fields.size > 3) {
                     val timestamp = fields[0].toLongOrNull()
                     var type : String?
-                    if(fields[1]=="ACC"){
+                    if(fields[1]=="ACC"||fields[1]=="PASSIVE_ACC"){
                          type = "2"
                     }else{
                          type = fields[1]
