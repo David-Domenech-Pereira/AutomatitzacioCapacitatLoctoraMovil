@@ -237,7 +237,7 @@ class PostService : IntentService("PostService") {
             }
 
             return ""
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             println("ERROR TOKEN")
         }

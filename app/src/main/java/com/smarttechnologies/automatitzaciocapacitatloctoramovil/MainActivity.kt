@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
         // Aquí configuramos el intervalo de tiempo para que se ejecute una vez al día.
         //val intervaloDia = 24 * 60 * 60 * 1000L // 24 horas en milisegundos.
-        val intervaloDia = 100L; //para probar ponemos cada segundo
+        val intervaloDia = 1000*60L; //para probar ponemos cada minuto
         // La primera ejecución se realiza después de un día (intervaloDia).
         val tiempoEjecucion = System.currentTimeMillis() + intervaloDia
 
