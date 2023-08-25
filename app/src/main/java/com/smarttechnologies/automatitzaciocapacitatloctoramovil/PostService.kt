@@ -21,6 +21,7 @@ import java.util.Date
 
 class PostService : IntentService("PostService") {
     lateinit var token: String
+    val MAX_LINES = 500
     override fun onHandleIntent(intent: Intent?) {
         println("Mandamos")
 
@@ -47,24 +48,26 @@ class PostService : IntentService("PostService") {
     }
     private fun borrarArchivo(nombreArchivo: String):Boolean{
         val directorio = filesDir // Obtén el directorio de archivos de la aplicación
-        val file: File = File(directorio,nombreArchivo)
-
-        // Verificar si el archivo existe antes de intentar borrarlo
-
-        // Verificar si el archivo existe antes de intentar borrarlo
-        return if (file.exists()) {
-            // Intentar borrar el archivo
-            if (file.delete()) {
-                // El archivo se borró exitosamente
-                true
-            } else {
-                // Fallo al borrar el archivo
-                false
-            }
-        } else {
-            // El archivo no existe, no es necesario borrarlo
-            false
+        val archivo: File = File(directorio,nombreArchivo)
+        if (!archivo.exists()) {
+            return false // El archivo no existe
         }
+
+        // Leer todas las líneas del archivo
+        val lineasOriginales = archivo.readLines()
+
+        if (lineasOriginales.size <= MAX_LINES) {
+            archivo.delete() // Si hay MAX_LINES o menos líneas, simplemente elimina el archivo
+            return true
+        }
+
+        // Obtener las líneas después de las primeras 500
+        val lineasRestantes = lineasOriginales.subList(MAX_LINES, lineasOriginales.size)
+
+        // Escribir las líneas restantes al archivo
+        archivo.writeText(lineasRestantes.joinToString("\n"))
+
+        return true
     }
     private fun getInfo(nombreArchivo:String) : List<sensorData>{
         val datos = arrayListOf<sensorData>()
@@ -77,8 +80,10 @@ class PostService : IntentService("PostService") {
             val reader = BufferedReader(InputStreamReader(inputStream))
             var line: String? = reader.readLine()
 
-            while (line != null) {
+            var actual_line = 0
+            while (line != null && actual_line<MAX_LINES) {
                 val fields = line.split(";")
+                actual_line++
                 if (fields.size > 3) {
                     val timestamp = fields[0].toLongOrNull()
                     var type : String?

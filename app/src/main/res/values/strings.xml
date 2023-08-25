@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">AutomatitzacioCapacitatLoctoraMovil</string>
+    <string name="channel_id">mi_canal_de_notificacion</string>
+    <string name="channel_name">Mi Canal de Notificación</string>
+    <string name="channel_description">Descripción del Canal de Notificación</string>
+
 </resources>

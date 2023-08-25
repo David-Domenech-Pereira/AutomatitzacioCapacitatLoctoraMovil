@@ -70,7 +70,7 @@ class BackgroundSensor : Service() {
 
 
                 val datos = "$x;$y;$z;" //posem les dades separades per ;
-                println("BACKGROUND=> "+datos)
+
 
                 guardarDatos(datos,"accelerometre");
             }
