@@ -30,10 +30,7 @@ class MainActivity : ComponentActivity() {
             val intent = Intent(this, Balance::class.java)
             startActivity(intent)
         }
-        val but_fit : Button = findViewById(R.id.butt_fit)
-        but_fit.setOnClickListener { // Cuando se hace clic en el botón, llamamos al método para mostrar el contenido del archivo
-            showFileContent()
-        }
+
         startService(Intent(this, BackgroundSensor::class.java))
         configurarServidor()
 
@@ -48,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
         // Aquí configuramos el intervalo de tiempo para que se ejecute una vez al día.
         //val intervaloDia = 24 * 60 * 60 * 1000L // 24 horas en milisegundos.
-        val intervaloDia = 1000*60L; //para probar ponemos cada minuto
+        val intervaloDia = 1000*1L; //para probar ponemos cada segundo
         // La primera ejecución se realiza después de un día (intervaloDia).
         val tiempoEjecucion = System.currentTimeMillis() + intervaloDia
 

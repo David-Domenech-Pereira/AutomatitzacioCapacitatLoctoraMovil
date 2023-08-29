@@ -33,13 +33,4 @@
         android:text="Test Equilibri"
         android:textSize="12sp" />
 
-    <Button
-        android:id="@+id/butt_fit"
-        android:layout_width="339dp"
-        android:layout_height="68dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="37dp"
-        android:layout_marginBottom="100dp"
-        android:text="Veure Fitxer" />
 </RelativeLayout>

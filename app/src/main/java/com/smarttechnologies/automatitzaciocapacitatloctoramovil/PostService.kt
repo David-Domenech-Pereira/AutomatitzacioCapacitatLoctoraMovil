@@ -1,7 +1,9 @@
 package com.smarttechnologies.automatitzaciocapacitatloctoramovil
 
+import android.app.AlertDialog
 import android.app.IntentService
 import android.content.Intent
+import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -21,28 +23,52 @@ import java.util.Date
 
 class PostService : IntentService("PostService") {
     lateinit var token: String
-    val MAX_LINES = 500
+    var MAX_LINES = 100000
     override fun onHandleIntent(intent: Intent?) {
         println("Mandamos")
-
+        val mensaje = "Enviant fitxer"
+        val duracion = Toast.LENGTH_SHORT // Puede ser Toast.LENGTH_LONG para una duración más larga
+        val toast = Toast.makeText(this, mensaje, duracion)
+        toast.show()
         val formatoFecha = SimpleDateFormat("yyyy-MM-dd")
         val fechaActual = formatoFecha.format(Date())
         val nombreArchivo = "$fechaActual.txt"
         token = obtenerToken("TOKENDEPROVA")
         //Obtenim la informació dels fitxers i la posem en un json
-        var info = getInfo(nombreArchivo)
-        var status : Boolean
-        status = false
-        for(data in info){
-            // Aquí es donde se realizará el POST request al servidor.
-            status = enviarPostRequestAlServidor(generateJson(data),"https://smarttechnologiesurv.000webhostapp.com/api/sensorData.php?ms=1")
-            if(status==false){
-                break
+        var status: Boolean
+        try {
+            var info = getInfo(nombreArchivo)
+
+            status = false
+            for (data in info) {
+                // Aquí es donde se realizará el POST request al servidor.
+                status = enviarPostRequestAlServidor(
+                    generateJson(data),
+                    "https://smarttechnologiesurv.000webhostapp.com/api/sensorData.php?ms=1"
+                )
+                if (status == false) {
+                    break
+                }
+            }
+        }catch (e:java.lang.Exception){
+            status = false
+            if(MAX_LINES > 1000) {
+                MAX_LINES -= 1000 //le quitamos 1000 para ajustarlo
             }
         }
         if(status==true){
+            val mensaje = "Fitxer enviat"
+            val duracion = Toast.LENGTH_SHORT // Puede ser Toast.LENGTH_LONG para una duración más larga
+            val toast = Toast.makeText(this, mensaje, duracion)
+            toast.show()
             println("Borramos el archivo")
             borrarArchivo(nombreArchivo)
+        }else{
+            // Crear un cuadro de diálogo de alerta
+            val mensaje = "ERROR"
+            val duracion = Toast.LENGTH_LONG // Puede ser Toast.LENGTH_LONG para una duración más larga
+            val toast = Toast.makeText(this, mensaje, duracion)
+            toast.show()
         }
 
     }
@@ -116,6 +142,10 @@ class PostService : IntentService("PostService") {
                     //no nos mandan los datos sino que se ha empezado o acabado un test
                     val timestamp = fields[0].toLongOrNull()
                     val type = fields[1]
+                    if(type=="BALANCE_POS"){
+                        //de moment ignorem aquesta posició
+                        continue;
+                    }
                     //separamos el type por el _
                     var type_info = type.split("_")
                     lateinit var  params:String
@@ -132,7 +162,7 @@ class PostService : IntentService("PostService") {
                     }
                     //Hacemos un GET request con los params y el header
                     val mediaType = "application/json".toMediaTypeOrNull()
-
+                    println("Start/End test")
                     val request = Request.Builder()
                         .url("https://smarttechnologiesurv.000webhostapp.com/api/testData.php"+params)
                         .addHeader("Content-Type", "application/json")
@@ -141,14 +171,12 @@ class PostService : IntentService("PostService") {
 
                     val client = OkHttpClient()
 
-                    try {
+
                         val response = client.newCall(request).execute()
                         val responseData = response.body?.string()
                         println("https://smarttechnologiesurv.000webhostapp.com/api/testData.php"+params)
                         println(responseData)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
+
                 }
 
                 line = reader.readLine()
@@ -165,7 +193,7 @@ class PostService : IntentService("PostService") {
         val jsonObject = JsonObject()
         val gson = Gson()
         jsonObject.addProperty("sensor", dataEntries.getSensor())
-
+        jsonObject.addProperty("ms",1) //marcamos como que son ms
         val dataArray = JsonArray()
         for (dataEntry in dataEntries.getData()) {
             val entryObject = JsonObject()

@@ -49,8 +49,9 @@ abstract class appBackground : ComponentActivity() {
         boton = findViewById(R.id.end)
         imageView = findViewById(R.id.imageView)
     }
+    lateinit var type: String
     public fun start(type: String){
-
+        this.type = type
         tiempoInicio = System.currentTimeMillis()// contem el temps desde que s'ha iniciat
 
         //inicialitzem
@@ -105,7 +106,7 @@ abstract class appBackground : ComponentActivity() {
         }
 
         vibrarReloj() //cridem l'atenció de l'usuariw
-        guardarDatos("Start","BALANCE_START")
+        guardarDatos("Start",type)
         //Hacemos que acabe en 10 segundos
         val handler = Handler(Looper.getMainLooper())
 
