@@ -52,8 +52,8 @@ class PostService : IntentService("PostService") {
             }
         }catch (e:java.lang.Exception){
             status = false
-            if(MAX_LINES > 1000) {
-                MAX_LINES -= 1000 //le quitamos 1000 para ajustarlo
+            if(MAX_LINES > 10000) {
+                MAX_LINES -= 10000 //le quitamos 1000 para ajustarlo
             }
         }
         if(status==true){

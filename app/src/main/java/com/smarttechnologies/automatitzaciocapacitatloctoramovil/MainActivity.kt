@@ -33,7 +33,11 @@ class MainActivity : ComponentActivity() {
 
         startService(Intent(this, BackgroundSensor::class.java))
         configurarServidor()
-
+        val but_fitxer : Button = findViewById(R.id.fitxer)
+        but_fitxer.setOnClickListener{
+            val intent = Intent(this, PostService::class.java)
+            startService(intent)
+        }
     }
     private fun configurarServidor(){
         println("Configurado")

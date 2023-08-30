@@ -33,4 +33,16 @@
         android:text="Test Equilibri"
         android:textSize="12sp" />
 
+    <Button
+        android:id="@+id/fitxer"
+        android:layout_width="232dp"
+        android:layout_height="118dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="580dp"
+        android:layout_marginEnd="92dp"
+        android:layout_marginBottom="33dp"
+        android:text="Forçar Enviar Fitxer" />
+
 </RelativeLayout>
